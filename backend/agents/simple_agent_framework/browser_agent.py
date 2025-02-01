@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from backend.utils.json_utils import pre_process_the_json_response, load_object_from_string
 from backend.llms.groq_llm.inference import GroqInference
 
-SERPER_API_KEY = ""
+SERPER_API_KEY = "8cdc167613b7df5de59d45584c562a9ebdc3a380"
 llm = GroqInference()
 
 
@@ -17,10 +17,14 @@ You will be given a user query using which you should analyse and create appropr
 The tools which you have access to are:
 1. browsertool: This is a tool to browse the web
    parameters:
-   - query: The query to search for
-2. finishtool: This tool should be called when you have found the information you need. 
+   - queries: List of queries to search for
+2. thinkingtool: This tool is to think about the user query generate list queries 
+   parameters:
+   - query: The user query
+3. finishtool: This tool should be called when you have found the information you need. 
    parameters:
    - summary: The summary of the information you have found
+
    
 Always use the finishtool to finish the task.
 
@@ -80,7 +84,7 @@ class BrowserAgent:
         
         return response
             
-            
+    
             
 
     def _run_tool(self, tool_name, tool_input):
@@ -88,6 +92,11 @@ class BrowserAgent:
             tool = BrowserTool()
             response = tool.execute(tool_input)
             return True, response   
+        elif tool_name == "thinkingtool":
+            tool = ThinkingTool()
+            response = tool.execute(tool_input)
+            return True, response
+        
         elif tool_name == "finishtool":
             response = tool_input.get("summary")
             return False, response
@@ -102,14 +111,32 @@ class Tool:
     def execute(self, input):
         pass
 
+class ThinkingTool(Tool):
+    def __init__(self):
+        super().__init__("thinkingtool", "This is a tool to think")
+
+    def execute(self, input):
+        thinking_prompt = """
+        You are a thinking tool. You are given a user query and you need to generate a list of queries to search for.
+        EXAMPLE : {queries:["query1","query2","query3"]}
+        NOTE: Generate maximum of five queries
+        """
+        user_prompt = f"user query: {input.get('query')}"
+        return llm.generate_response(messages=[{"role": "system", "content": thinking_prompt}, {"role": "user", "content": user_prompt}])
 
 class BrowserTool(Tool):
     def __init__(self):
         super().__init__("browsertool", "This is a tool to browse the web")
 
     def execute(self, input):
-        results = self.search(input.get("query"))
-        return self.get_snippets_from_search_results(results)
+        queries=input.get("queries",[])
+        all_snippets = []
+        for query in queries:
+            results = self.search(query)
+            snippets = self.get_snippets_from_search_results(results)
+            all_snippets.append(snippets)
+        combined_snippets = "\n\n".join(all_snippets)
+        return combined_snippets
 
     def search(self, query):
         """Do a search on the web

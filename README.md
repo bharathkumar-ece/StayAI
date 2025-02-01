@@ -53,6 +53,7 @@ cd backend/agents/stay_ai_crew
 cp env_template.txt .env
 
 # Run CrewAI setup
+uv cache clean
 crewai run
 ```
 

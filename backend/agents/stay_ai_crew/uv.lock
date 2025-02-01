@@ -524,11 +524,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/04/3808fe66acabebc5b5dcf00e4f290ae67a817d18ad96b043dd9769f51da8/crewai-0.86.0-py3-none-any.whl", hash = "sha256:ef1ff4b3df85a72eda2d64ea6fcd7f53461271e13822ff4937d0fa41055ef025", size = 192034 },
 ]
 
-[package.optional-dependencies]
-tools = [
-    { name = "crewai-tools" },
-]
-
 [[package]]
 name = "crewai-tools"
 version = "0.17.0"
@@ -3427,11 +3422,17 @@ name = "stay-ai-crew"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "crewai", extra = ["tools"] },
+    { name = "crewai" },
+    { name = "langchain-openai" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "crewai", extras = ["tools"], specifier = ">=0.86.0,<1.0.0" }]
+requires-dist = [
+    { name = "crewai" },
+    { name = "langchain-openai" },
+    { name = "python-dotenv" },
+]
 
 [[package]]
 name = "sympy"

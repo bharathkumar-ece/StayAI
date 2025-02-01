@@ -1,4 +1,2 @@
-JINA_API_KEY = <place-your-key>
-GROQ_API_KEY = <place-your-key>
-
-
+JINA_API_KEY = jina_8f172b1525cd48798c37bfeec75fe99acIeLM017JtFQOiIwhiZgCcDfAL8X
+GROQ_API_KEY = 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
