@@ -81,8 +81,6 @@ class BrowserAgent:
                 print("\n=== Final Response ===")
                 print(response)
                 return response
-        
-        return response
             
     
             
